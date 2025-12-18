@@ -2,94 +2,95 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Inventory Manager</title>
+    <title>Platform UMKM - Analytics</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-50 min-h-screen font-sans text-gray-800">
+<body class="bg-[#f8fafc] flex min-h-screen">
 
-    <nav class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <span class="text-2xl">📊</span>
-                <span class="font-bold text-xl text-gray-800">Inventory App</span>
-            </div>
-            <div class="flex gap-2">
-                <a href="index.html" class="text-gray-600 hover:text-blue-600 font-medium px-3 py-2 rounded-lg transition">Scanner</a>
-                <a href="order.html" class="text-gray-600 hover:text-blue-600 font-medium px-3 py-2 rounded-lg transition">Order</a>
-                <a href="dashboard.html" class="bg-blue-100 text-blue-700 font-medium px-3 py-2 rounded-lg transition">Dashboard</a>
-            </div>
+    <aside class="w-72 bg-slate-900 text-white flex flex-col sticky top-0 h-screen">
+        <div class="p-8 text-2xl font-black tracking-tighter italic border-b border-slate-800">
+            KASIR.<span class="text-indigo-500">PRO</span>
         </div>
-    </nav>
-
-    <div class="max-w-4xl mx-auto px-4 py-8">
-        
-        <div class="flex flex-col md:flex-row justify-between items-end mb-6 gap-4">
-            <div>
-                <h2 class="text-3xl font-bold text-gray-900">Inventory List</h2>
-                <p class="text-gray-500 mt-1">View and manage all your tracked products.</p>
-            </div>
-            <a href="index.html" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg shadow-md font-semibold flex items-center gap-2 transition hover:-translate-y-0.5">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                Scan New Item
+        <nav class="flex-1 px-4 py-6 space-y-2">
+            <a href="dashboard.html" class="flex items-center p-3 bg-indigo-600 rounded-xl text-white font-bold shadow-lg shadow-indigo-900/50">
+                <i class="fas fa-chart-pie mr-3"></i> Overview
             </a>
-        </div>
+            <a href="order.html" class="flex items-center p-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl transition">
+                <i class="fas fa-cash-register mr-3"></i> Terminal POS
+            </a>
+            <a href="inventory.html" class="flex items-center p-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl transition">
+                <i class="fas fa-boxes mr-3"></i> Inventory
+            </a>
+        </nav>
+        <div class="p-6 border-t border-slate-800 text-xs text-slate-500">v2.0 Managed by IOT System</div>
+    </aside>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-gray-50 text-gray-500 uppercase text-xs font-bold tracking-wider">
-                        <tr>
-                            <th class="p-4 border-b">Product Name</th>
-                            <th class="p-4 border-b">Barcode</th>
-                            <th class="p-4 border-b">Qty</th>
-                            <th class="p-4 border-b text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="inventory-table-body" class="divide-y divide-gray-100 text-sm text-gray-700">
-                        </tbody>
-                </table>
+    <main class="flex-1 p-10 overflow-y-auto">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800">Business Dashboard</h1>
+                <p class="text-slate-500">Real-time store performance and inventory metrics.</p>
             </div>
-            
-            <div id="empty-state" class="hidden p-10 text-center">
-                <div class="text-5xl mb-3">📦</div>
-                <h3 class="text-lg font-medium text-gray-900">No products yet</h3>
-                <p class="text-gray-500 mb-4">Start scanning to build your inventory.</p>
-                <a href="index.html" class="text-blue-600 font-semibold hover:underline">Go to Scanner &rarr;</a>
+            <div class="bg-white px-4 py-2 rounded-full shadow-sm border text-slate-600 font-medium">
+                <i class="far fa-calendar-alt mr-2 text-indigo-500"></i> <span id="currentDate"></span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <p class="text-slate-400 font-bold text-xs uppercase mb-1">Total Revenue</p>
+                <h2 class="text-2xl font-black text-slate-900" id="statRevenue">Rp 0</h2>
+                <div class="mt-2 text-emerald-500 text-xs font-bold"><i class="fas fa-arrow-up"></i> 12% Growth</div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <p class="text-slate-400 font-bold text-xs uppercase mb-1">Active Catalog</p>
+                <h2 class="text-2xl font-black text-slate-900" id="statItems">0 Items</h2>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-red-50 shadow-sm">
+                <p class="text-red-400 font-bold text-xs uppercase mb-1">Low Stock</p>
+                <h2 class="text-2xl font-black text-red-600" id="statLowStock">0 Alerts</h2>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm bg-indigo-50/30">
+                <p class="text-indigo-400 font-bold text-xs uppercase mb-1">Best Seller</p>
+                <h2 class="text-xl font-black text-indigo-900 truncate" id="statTopProduct">-</h2>
             </div>
         </div>
-    </div>
 
-    <div id="edit-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 transform transition-all">
-            <h3 class="text-xl font-bold mb-4 text-gray-800">Edit Product</h3>
-            <form id="edit-form" class="space-y-4">
-                <input type="hidden" id="edit-id">
-                
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Name</label>
-                    <input type="text" id="edit-name" class="w-full border-gray-300 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Barcode</label>
-                    <input type="text" id="edit-barcode" class="w-full border bg-gray-100 text-gray-500 rounded-lg p-2 cursor-not-allowed" readonly>
-                </div>
-                
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Quantity</label>
-                    <input type="number" id="edit-qty" class="w-full border-gray-300 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-
-                <div class="flex justify-end gap-3 mt-6">
-                    <button type="button" onclick="closeModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg font-medium">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 shadow">Save Changes</button>
-                </div>
-            </form>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                <h3 class="font-bold text-slate-700 mb-6 flex items-center">
+                    <span class="w-2 h-6 bg-indigo-500 rounded-full mr-3"></span> Revenue Stream
+                </h3>
+                <canvas id="revenueChart"></canvas>
+            </div>
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                <h3 class="font-bold text-slate-700 mb-6 flex items-center">
+                    <span class="w-2 h-6 bg-emerald-500 rounded-full mr-3"></span> Product Popularity
+                </h3>
+                <canvas id="productChart"></canvas>
+            </div>
         </div>
-    </div>
+
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+            <div class="p-6 bg-slate-50/50 border-b flex justify-between items-center">
+                <h3 class="font-bold text-slate-700">Transaction History</h3>
+                <a href="order.html" class="bg-indigo-100 text-indigo-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-indigo-600 hover:text-white transition">New Order</a>
+            </div>
+            <table class="w-full text-left">
+                <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-bold tracking-widest">
+                    <tr>
+                        <th class="px-8 py-4">TXN ID</th>
+                        <th class="px-8 py-4">Timestamp</th>
+                        <th class="px-8 py-4">Total Price</th>
+                        <th class="px-8 py-4 text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody" class="divide-y text-sm text-slate-600 font-medium"></tbody>
+            </table>
+        </div>
+    </main>
 
     <script src="dashboard.js"></script>
 </body>

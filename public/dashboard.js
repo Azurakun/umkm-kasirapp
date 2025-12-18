@@ -1,125 +1,67 @@
-// public/dashboard.js
-
-const tableBody = document.getElementById('inventory-table-body');
-const emptyState = document.getElementById('empty-state');
-const editModal = document.getElementById('edit-modal');
-
-// 1. Fetch and Display Products
-async function loadProducts() {
-    try {
-        console.log("Attempting to fetch from /api/products...");
-        const res = await fetch('/api/products');
-        
-        // If server sends a 404 or 500 error
-        if (!res.ok) {
-            throw new Error(`Server Error: ${res.status} ${res.statusText}`);
-        }
-
-        const products = await res.json();
-        
-        tableBody.innerHTML = ''; // Clear table
-        
-        if (products.length === 0) {
-            emptyState.classList.remove('hidden');
-        } else {
-            emptyState.classList.add('hidden');
-            products.forEach(product => {
-                const row = document.createElement('tr');
-                row.className = "hover:bg-gray-50 transition-colors border-b";
-                row.innerHTML = `
-                    <td class="p-4 font-medium text-gray-900">${product.name || 'Unknown'}</td>
-                    <td class="p-4 font-mono text-gray-500">${product.barcode}</td>
-                    <td class="p-4">
-                        <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full">
-                            ${product.quantity} units
-                        </span>
-                    </td>
-                    <td class="p-4 text-right space-x-2">
-                        <button onclick="openEdit('${product._id}', '${product.name}', '${product.barcode}', ${product.quantity})" 
-                            class="text-blue-600 hover:text-blue-800 font-medium text-sm border border-blue-200 hover:bg-blue-50 px-3 py-1 rounded">
-                            Edit
-                        </button>
-                        <button onclick="deleteProduct('${product._id}')" 
-                            class="text-red-600 hover:text-red-800 font-medium text-sm border border-red-200 hover:bg-red-50 px-3 py-1 rounded">
-                            Delete
-                        </button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-    } catch (err) {
-        console.error("Error loading products:", err);
-        // SHOW THE REAL ERROR ON SCREEN
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="4" class="p-6 text-center text-red-600 bg-red-50 rounded-lg">
-                    <strong class="block text-lg">Connection Failed</strong>
-                    <span class="text-sm">${err.message}</span>
-                    <br><br>
-                    <span class="text-xs text-gray-600">
-                        Tip: Make sure you are using <b>http://localhost:3000</b><br>
-                        and not file://...
-                    </span>
-                </td>
-            </tr>`;
-    }
-}
-
-// 2. Delete Logic
-async function deleteProduct(id) {
-    if (!confirm("Are you sure you want to delete this product?")) return;
-
-    try {
-        const res = await fetch(`/api/product/${id}`, { method: 'DELETE' });
-        if (res.ok) {
-            loadProducts(); 
-        } else {
-            alert("Failed to delete.");
-        }
-    } catch (err) {
-        alert("Connection Error: " + err.message);
-    }
-}
-
-// 3. Edit Logic (Open Modal)
-function openEdit(id, name, barcode, qty) {
-    document.getElementById('edit-id').value = id;
-    document.getElementById('edit-name').value = name;
-    document.getElementById('edit-barcode').value = barcode;
-    document.getElementById('edit-qty').value = qty;
-    editModal.classList.remove('hidden');
-}
-
-function closeModal() {
-    editModal.classList.add('hidden');
-}
-
-// 4. Save Edit
-document.getElementById('edit-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const id = document.getElementById('edit-id').value;
-    const name = document.getElementById('edit-name').value;
-    const qty = document.getElementById('edit-qty').value;
-    const barcode = document.getElementById('edit-barcode').value;
-
-    try {
-        const res = await fetch(`/api/product/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, quantity: qty, barcode })
-        });
-
-        if (res.ok) {
-            closeModal();
-            loadProducts();
-        } else {
-            alert("Error updating product");
-        }
-    } catch (err) {
-        alert("Server error: " + err.message);
-    }
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID', { 
+        year: 'numeric', month: 'long', day: 'numeric' 
+    });
+    initAnalytics();
+    loadTransactions();
 });
 
-// Load on start
-window.onload = loadProducts;
+async function initAnalytics() {
+    const res = await fetch('/api/stats/summary');
+    const data = await res.json();
+
+    document.getElementById('statRevenue').innerText = `Rp ${data.totalRevenue.toLocaleString()}`;
+    document.getElementById('statItems').innerText = `${data.totalProducts} Items`;
+    document.getElementById('statLowStock').innerText = `${data.lowStockAlerts} Alerts`;
+    document.getElementById('statTopProduct').innerText = data.topProducts[0]?._id || 'N/A';
+
+    // 📈 Revenue Trend Chart
+    new Chart(document.getElementById('revenueChart'), {
+        type: 'line',
+        data: {
+            labels: data.monthlyTrends.map(m => m._id),
+            datasets: [{
+                label: 'Monthly Revenue',
+                data: data.monthlyTrends.map(m => m.total),
+                borderColor: '#6366f1',
+                backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 6,
+                pointBackgroundColor: '#6366f1'
+            }]
+        },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+
+    // 📊 Product Distribution Chart
+    new Chart(document.getElementById('productChart'), {
+        type: 'doughnut',
+        data: {
+            labels: data.topProducts.map(p => p._id),
+            datasets: [{
+                data: data.topProducts.map(p => p.count),
+                backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+                hoverOffset: 20
+            }]
+        },
+        options: { cutout: '70%', plugins: { legend: { position: 'bottom' } } }
+    });
+}
+
+async function loadTransactions() {
+    const res = await fetch('/api/orders/history');
+    const orders = await res.json();
+    const body = document.getElementById('historyBody');
+    
+    body.innerHTML = orders.map(order => `
+        <tr class="hover:bg-slate-50 transition">
+            <td class="px-8 py-5 font-mono text-xs text-slate-400">#${order._id.slice(-8)}</td>
+            <td class="px-8 py-5">${new Date(order.timestamp).toLocaleString()}</td>
+            <td class="px-8 py-5 font-bold text-slate-900">Rp ${order.totalAmount.toLocaleString()}</td>
+            <td class="px-8 py-5 text-center">
+                <button class="text-slate-400 hover:text-indigo-600"><i class="fas fa-external-link-alt"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
