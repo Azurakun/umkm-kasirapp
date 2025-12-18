@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Inventory Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans text-gray-800">
+
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">📊</span>
+                <span class="font-bold text-xl text-gray-800">Inventory App</span>
+            </div>
+            <div class="flex gap-2">
+                <a href="index.html" class="text-gray-600 hover:text-blue-600 font-medium px-3 py-2 rounded-lg transition">Scanner</a>
+                <a href="order.html" class="text-gray-600 hover:text-blue-600 font-medium px-3 py-2 rounded-lg transition">Order</a>
+                <a href="dashboard.html" class="bg-blue-100 text-blue-700 font-medium px-3 py-2 rounded-lg transition">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        
+        <div class="flex flex-col md:flex-row justify-between items-end mb-6 gap-4">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900">Inventory List</h2>
+                <p class="text-gray-500 mt-1">View and manage all your tracked products.</p>
+            </div>
+            <a href="index.html" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg shadow-md font-semibold flex items-center gap-2 transition hover:-translate-y-0.5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Scan New Item
+            </a>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50 text-gray-500 uppercase text-xs font-bold tracking-wider">
+                        <tr>
+                            <th class="p-4 border-b">Product Name</th>
+                            <th class="p-4 border-b">Barcode</th>
+                            <th class="p-4 border-b">Qty</th>
+                            <th class="p-4 border-b text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-table-body" class="divide-y divide-gray-100 text-sm text-gray-700">
+                        </tbody>
+                </table>
+            </div>
+            
+            <div id="empty-state" class="hidden p-10 text-center">
+                <div class="text-5xl mb-3">📦</div>
+                <h3 class="text-lg font-medium text-gray-900">No products yet</h3>
+                <p class="text-gray-500 mb-4">Start scanning to build your inventory.</p>
+                <a href="index.html" class="text-blue-600 font-semibold hover:underline">Go to Scanner &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="edit-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 transform transition-all">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">Edit Product</h3>
+            <form id="edit-form" class="space-y-4">
+                <input type="hidden" id="edit-id">
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Name</label>
+                    <input type="text" id="edit-name" class="w-full border-gray-300 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Barcode</label>
+                    <input type="text" id="edit-barcode" class="w-full border bg-gray-100 text-gray-500 rounded-lg p-2 cursor-not-allowed" readonly>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Quantity</label>
+                    <input type="number" id="edit-qty" class="w-full border-gray-300 border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg font-medium">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 shadow">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
