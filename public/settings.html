@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan Struk - KasirApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .sidebar-link:hover { background-color: #374151; }
+        .active-link { background-color: #374151; border-bottom: 4px solid #3b82f6; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div id="notification" class="fixed top-5 right-5 z-[100] transform translate-x-full transition-transform duration-300">
+        <div id="notification-content" class="bg-white border-l-4 p-4 shadow-2xl rounded-lg min-w-[300px] flex items-center border-green-500">
+            <span id="notification-text" class="font-medium text-gray-800"></span>
+        </div>
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+        <aside class="w-64 bg-gray-800 text-white flex-shrink-0 flex flex-col">
+            <div class="p-6 text-2xl font-bold border-b border-gray-700">KasirApp</div>
+            <nav class="flex-1 mt-4">
+                <a href="dashboard.html" class="sidebar-link flex items-center px-6 py-3 text-gray-300"><i class="fas fa-chart-line w-6"></i> Dashboard</a>
+                <a href="order.html" class="sidebar-link flex items-center px-6 py-3 text-gray-300"><i class="fas fa-cash-register w-6"></i> Terminal POS</a>
+                <a href="inventory.html" class="sidebar-link flex items-center px-6 py-3 text-gray-300"><i class="fas fa-boxes w-6"></i> Inventaris</a>
+                <a href="history.html" class="sidebar-link flex items-center px-6 py-3 text-gray-300"><i class="fas fa-history w-6"></i> Riwayat Struk</a>
+                <a href="settings.html" class="sidebar-link active-link flex items-center px-6 py-3 text-white"><i class="fas fa-cog w-6"></i> Pengaturan Struk</a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-8 bg-gray-50 overflow-y-auto">
+            <div class="max-w-2xl bg-white p-8 rounded-2xl shadow-sm border">
+                <h1 class="text-2xl font-bold mb-6">Kustomisasi Struk</h1>
+                <form id="settingsForm" class="space-y-6">
+                    <div><label class="block text-sm font-medium">Nama Toko</label><input type="text" id="shopName" class="w-full p-3 border rounded-lg mt-1"></div>
+                    <div><label class="block text-sm font-medium">Alamat</label><input type="text" id="address" class="w-full p-3 border rounded-lg mt-1"></div>
+                    <div><label class="block text-sm font-medium">Nomor Telepon</label><input type="text" id="phone" class="w-full p-3 border rounded-lg mt-1"></div>
+                    <div><label class="block text-sm font-medium">Pesan Kaki (Footer)</label><textarea id="footer" class="w-full p-3 border rounded-lg mt-1"></textarea></div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700">SIMPAN PENGATURAN</button>
+                </form>
+            </div>
+        </main>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const res = await fetch('/api/settings');
+            const data = await res.json();
+            document.getElementById('shopName').value = data.shopName;
+            document.getElementById('address').value = data.address;
+            document.getElementById('phone').value = data.phone;
+            document.getElementById('footer').value = data.footer;
+        });
+
+        document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                shopName: document.getElementById('shopName').value,
+                address: document.getElementById('address').value,
+                phone: document.getElementById('phone').value,
+                footer: document.getElementById('footer').value
+            };
+            const res = await fetch('/api/settings', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            if(res.ok) {
+                const n = document.getElementById('notification');
+                document.getElementById('notification-text').innerText = 'Pengaturan Berhasil Disimpan!';
+                n.classList.remove('translate-x-full');
+                setTimeout(() => n.classList.add('translate-x-full'), 3000);
+            }
+        });
+    </script>
+</body>
+</html>

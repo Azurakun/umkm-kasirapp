@@ -9,10 +9,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .sidebar-link:hover { background-color: #374151; }
-        .active-link { background-color: #374151; border-left: 4px solid #3b82f6; }
+        .active-link { background-color: #374151; border-bottom: 4px solid #3b82f6; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
+    <div id="notification" class="fixed top-5 right-5 z-[100] transform translate-x-full transition-transform duration-300">
+        <div id="notification-content" class="bg-white border-l-4 p-4 shadow-2xl rounded-lg min-w-[300px] flex items-center">
+            <i id="notification-icon" class="mr-3"></i>
+            <span id="notification-text" class="font-medium text-gray-800"></span>
+        </div>
+    </div>
+
     <div class="flex h-screen overflow-hidden">
         <aside class="w-64 bg-gray-800 text-white flex-shrink-0 flex flex-col">
             <div class="p-6 text-2xl font-bold border-b border-gray-700">
@@ -43,7 +50,10 @@
                 <div class="flex space-x-4 mb-6">
                     <input type="text" id="searchInput" placeholder="Cari produk..." class="flex-1 p-2 border rounded-lg">
                     <select id="catFilter" class="p-2 border rounded-lg">
-                        <option value="">Semua Kategori</option>
+                        <option value="All">Semua Kategori</option>
+                        <option value="General">General</option>
+                        <option value="Food">Food</option>
+                        <option value="Drink">Drink</option>
                     </select>
                 </div>
 
@@ -52,17 +62,67 @@
                         <thead class="bg-gray-50 border-b">
                             <tr>
                                 <th class="p-4 font-semibold text-gray-600">Nama</th>
+                                <th class="p-4 font-semibold text-gray-600">Kategori</th>
                                 <th class="p-4 font-semibold text-gray-600">Harga</th>
                                 <th class="p-4 font-semibold text-gray-600">Stok</th>
-                                <th class="p-4 font-semibold text-gray-600">Kategori</th>
-                                <th class="p-4 font-semibold text-gray-600">Aksi</th>
+                                <th class="p-4 font-semibold text-gray-600">Status</th>
+                                <th class="p-4 font-semibold text-gray-600 text-right">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="itemList" class="divide-y"></tbody>
+                        <tbody id="inventoryBody" class="divide-y"></tbody>
                     </table>
                 </div>
             </div>
         </main>
+    </div>
+
+    <div id="itemModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
+            <h2 id="modalTitle" class="text-xl font-bold mb-6">Registrasi Produk</h2>
+            <form id="itemForm" class="space-y-4">
+                <input type="hidden" id="itemId">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nama Produk</label>
+                    <input type="text" id="itemName" required class="w-full p-2 border rounded-lg">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Harga</label>
+                        <input type="number" id="itemPrice" required class="w-full p-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Stok</label>
+                        <input type="number" id="itemStock" required class="w-full p-2 border rounded-lg">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Kategori</label>
+                    <select id="itemCat" class="w-full p-2 border rounded-lg">
+                        <option value="General">General</option>
+                        <option value="Food">Food</option>
+                        <option value="Drink">Drink</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Barcode/QR Code</label>
+                    <div class="flex space-x-2">
+                        <input type="text" id="itemCode" class="flex-1 p-2 border rounded-lg" placeholder="Scan or type...">
+                        <button type="button" onclick="openScanner()" class="bg-gray-200 p-2 rounded-lg hover:bg-gray-300">
+                            <i class="fas fa-qrcode"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 text-gray-500 hover:text-gray-700 font-bold">Batal</button>
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="scanOverlay" class="hidden fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-[60]">
+        <div id="reader" class="w-full max-w-sm rounded-xl overflow-hidden shadow-2xl"></div>
+        <button onclick="closeScanner()" class="mt-8 bg-red-500 text-white px-8 py-3 rounded-full font-bold">TUTUP KAMERA</button>
     </div>
 
     <script src="inventory.js"></script>
