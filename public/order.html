@@ -2,64 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Terminal POS - Kasir Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal POS - KasirApp</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .sidebar-link:hover { background-color: #374151; }
+        .active-link { background-color: #374151; border-left: 4px solid #3b82f6; }
+    </style>
 </head>
-<body class="bg-[#f1f5f9] flex h-screen overflow-hidden">
-
-    <div class="flex-1 flex flex-col p-8">
-        <header class="flex justify-between items-center mb-8">
-            <a href="dashboard.html" class="bg-white p-3 rounded-2xl shadow-sm hover:bg-slate-50 transition border font-bold text-slate-600">
-                <i class="fas fa-chevron-left mr-2"></i> Dashboard
-            </a>
-            <div class="flex space-x-4">
-                <input id="search" type="text" placeholder="Search product..." class="px-6 py-3 rounded-2xl border-none shadow-sm w-80 ring-2 ring-transparent focus:ring-indigo-500 outline-none">
-                <button onclick="toggleScanner()" class="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:bg-indigo-700 transition">
-                    <i class="fas fa-barcode mr-2"></i> SCAN BARCODE
-                </button>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <aside class="w-64 bg-gray-800 text-white flex-shrink-0 flex flex-col">
+            <div class="p-6 text-2xl font-bold border-b border-gray-700">
+                <i class="fas fa-store-alt mr-2 text-blue-400"></i>KasirApp
             </div>
-        </header>
+            <nav class="flex-1 mt-4">
+                <a href="dashboard.html" class="sidebar-link flex items-center px-6 py-3 text-gray-300">
+                    <i class="fas fa-chart-line w-6"></i> Dashboard
+                </a>
+                <a href="order.html" class="sidebar-link active-link flex items-center px-6 py-3 text-white">
+                    <i class="fas fa-cash-register w-6 text-blue-400"></i> Terminal POS
+                </a>
+                <a href="inventory.html" class="sidebar-link flex items-center px-6 py-3 text-gray-300">
+                    <i class="fas fa-boxes w-6"></i> Inventaris
+                </a>
+            </nav>
+        </aside>
 
-        <div id="productGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6 overflow-y-auto pr-4">
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center border-b">
+                <h1 class="text-2xl font-semibold text-gray-800">Terminal POS</h1>
+                <div class="flex items-center space-x-4">
+                    <span id="current-time" class="text-gray-500"></span>
+                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">A</div>
+                </div>
+            </header>
+
+            <div class="p-6 flex-1 flex space-x-6 overflow-hidden bg-gray-50">
+                <div class="flex-1 flex flex-col overflow-hidden">
+                    <input type="text" id="product-search" placeholder="Cari produk..." class="mb-4 p-2 border rounded-lg">
+                    <div id="products-grid" class="grid grid-cols-3 gap-4 overflow-y-auto"></div>
+                </div>
+
+                <div class="w-96 bg-white rounded-xl shadow-lg flex flex-col border border-gray-200">
+                    <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+                    <div class="p-4 border-t bg-gray-50">
+                        <div class="flex justify-between font-bold text-xl mb-4">
+                            <span>Total</span>
+                            <span id="total-price">Rp 0</span>
+                        </div>
+                        <button id="checkout-btn" disabled class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 disabled:bg-gray-300">
+                            PROSES PEMBAYARAN
+                        </button>
+                    </div>
+                </div>
             </div>
+        </main>
     </div>
-
-    <div class="w-[400px] bg-white border-l shadow-2xl flex flex-col">
-        <div class="p-8 border-b">
-            <h2 class="text-2xl font-black text-slate-800 tracking-tight">Shopping Cart</h2>
-        </div>
-        
-        <div id="cartList" class="flex-1 p-6 space-y-4 overflow-y-auto">
-            </div>
-
-        <div class="p-8 bg-slate-50 border-t space-y-4">
-            <div class="flex justify-between items-center text-slate-500 font-bold uppercase text-xs tracking-widest">
-                <span>Subtotal</span>
-                <span id="subtotal">Rp 0</span>
-            </div>
-            <div class="flex justify-between items-center text-2xl font-black text-slate-900">
-                <span>TOTAL</span>
-                <span id="cartTotal">Rp 0</span>
-            </div>
-            <button onclick="checkout()" class="w-full bg-emerald-500 text-white py-5 rounded-3xl font-black text-lg shadow-xl shadow-emerald-200 hover:bg-emerald-600 transition uppercase tracking-widest">
-                Confirm Order
-            </button>
-        </div>
-    </div>
-
-    <div id="scannerModal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md z-50 flex items-center justify-center p-6">
-        <div class="bg-white w-full max-w-xl rounded-[40px] overflow-hidden shadow-2xl">
-            <div class="p-8 bg-slate-50 flex justify-between items-center border-b">
-                <h3 class="font-bold text-slate-800 text-xl">Laser Scanner Active</h3>
-                <button onclick="toggleScanner()" class="text-slate-400 hover:text-red-500"><i class="fas fa-times text-2xl"></i></button>
-            </div>
-            <div id="reader" class="w-full aspect-square"></div>
-            <div class="p-6 text-center text-slate-400 text-sm italic">Point your camera at a QR or Barcode</div>
-        </div>
-    </div>
-
     <script src="order.js"></script>
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            if (document.getElementById('current-time')) document.getElementById('current-time').innerText = timeStr;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
 </body>
 </html>

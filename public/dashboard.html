@@ -2,96 +2,79 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Platform UMKM - Analytics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - KasirApp</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .sidebar-link:hover { background-color: #374151; }
+        .active-link { background-color: #374151; border-left: 4px solid #3b82f6; }
+    </style>
 </head>
-<body class="bg-[#f8fafc] flex min-h-screen">
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <aside class="w-64 bg-gray-800 text-white flex-shrink-0 flex flex-col">
+            <div class="p-6 text-2xl font-bold border-b border-gray-700">
+                <i class="fas fa-store-alt mr-2 text-blue-400"></i>KasirApp
+            </div>
+            <nav class="flex-1 mt-4">
+                <a href="dashboard.html" class="sidebar-link active-link flex items-center px-6 py-3 text-white">
+                    <i class="fas fa-chart-line w-6 text-blue-400"></i> Dashboard
+                </a>
+                <a href="order.html" class="sidebar-link flex items-center px-6 py-3 text-gray-300">
+                    <i class="fas fa-cash-register w-6"></i> Terminal POS
+                </a>
+                <a href="inventory.html" class="sidebar-link flex items-center px-6 py-3 text-gray-300">
+                    <i class="fas fa-boxes w-6"></i> Inventaris
+                </a>
+            </nav>
+            <div class="p-4 border-t border-gray-700">
+                <button class="w-full flex items-center px-4 py-2 text-red-400 hover:bg-gray-700 rounded transition">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Keluar
+                </button>
+            </div>
+        </aside>
 
-    <aside class="w-72 bg-slate-900 text-white flex flex-col sticky top-0 h-screen">
-        <div class="p-8 text-2xl font-black tracking-tighter italic border-b border-slate-800">
-            KASIR.<span class="text-indigo-500">PRO</span>
-        </div>
-        <nav class="flex-1 px-4 py-6 space-y-2">
-            <a href="dashboard.html" class="flex items-center p-3 bg-indigo-600 rounded-xl text-white font-bold shadow-lg shadow-indigo-900/50">
-                <i class="fas fa-chart-pie mr-3"></i> Overview
-            </a>
-            <a href="order.html" class="flex items-center p-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl transition">
-                <i class="fas fa-cash-register mr-3"></i> Terminal POS
-            </a>
-            <a href="inventory.html" class="flex items-center p-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl transition">
-                <i class="fas fa-boxes mr-3"></i> Inventory
-            </a>
-        </nav>
-        <div class="p-6 border-t border-slate-800 text-xs text-slate-500">v2.0 Managed by IOT System</div>
-    </aside>
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center border-b">
+                <h1 class="text-2xl font-semibold text-gray-800">Dashboard</h1>
+                <div class="flex items-center space-x-4">
+                    <span id="currentDate" class="text-gray-500 font-medium"></span>
+                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">A</div>
+                </div>
+            </header>
 
-    <main class="flex-1 p-10 overflow-y-auto">
-        <header class="flex justify-between items-center mb-10">
-            <div>
-                <h1 class="text-3xl font-bold text-slate-800">Business Dashboard</h1>
-                <p class="text-slate-500">Real-time store performance and inventory metrics.</p>
-            </div>
-            <div class="bg-white px-4 py-2 rounded-full shadow-sm border text-slate-600 font-medium">
-                <i class="far fa-calendar-alt mr-2 text-indigo-500"></i> <span id="currentDate"></span>
-            </div>
-        </header>
+            <div class="p-8 flex-1 overflow-y-auto bg-gray-50">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <p class="text-gray-500 text-sm font-medium">Total Penjualan Hari Ini</p>
+                        <h3 id="totalSales" class="text-2xl font-bold text-gray-800 mt-1">Rp 0</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <p class="text-gray-500 text-sm font-medium">Jumlah Pesanan</p>
+                        <h3 id="orderCount" class="text-2xl font-bold text-gray-800 mt-1">0</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <p class="text-gray-500 text-sm font-medium">Produk Aktif</p>
+                        <h3 id="activeProducts" class="text-2xl font-bold text-gray-800 mt-1">0</h3>
+                    </div>
+                </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                <p class="text-slate-400 font-bold text-xs uppercase mb-1">Total Revenue</p>
-                <h2 class="text-2xl font-black text-slate-900" id="statRevenue">Rp 0</h2>
-                <div class="mt-2 text-emerald-500 text-xs font-bold"><i class="fas fa-arrow-up"></i> 12% Growth</div>
-            </div>
-            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                <p class="text-slate-400 font-bold text-xs uppercase mb-1">Active Catalog</p>
-                <h2 class="text-2xl font-black text-slate-900" id="statItems">0 Items</h2>
-            </div>
-            <div class="bg-white p-6 rounded-2xl border border-red-50 shadow-sm">
-                <p class="text-red-400 font-bold text-xs uppercase mb-1">Low Stock</p>
-                <h2 class="text-2xl font-black text-red-600" id="statLowStock">0 Alerts</h2>
-            </div>
-            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm bg-indigo-50/30">
-                <p class="text-indigo-400 font-bold text-xs uppercase mb-1">Best Seller</p>
-                <h2 class="text-xl font-black text-indigo-900 truncate" id="statTopProduct">-</h2>
-            </div>
-        </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+                    <h2 class="text-lg font-semibold mb-4">Grafik Penjualan</h2>
+                    <canvas id="salesChart" height="100"></canvas>
+                </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-                <h3 class="font-bold text-slate-700 mb-6 flex items-center">
-                    <span class="w-2 h-6 bg-indigo-500 rounded-full mr-3"></span> Revenue Stream
-                </h3>
-                <canvas id="revenueChart"></canvas>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+                    <div class="p-6 border-b border-gray-50">
+                        <h2 class="text-lg font-semibold">Aktivitas Terbaru</h2>
+                    </div>
+                    <ul id="recentActivity" class="divide-y divide-gray-50"></ul>
+                </div>
             </div>
-            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-                <h3 class="font-bold text-slate-700 mb-6 flex items-center">
-                    <span class="w-2 h-6 bg-emerald-500 rounded-full mr-3"></span> Product Popularity
-                </h3>
-                <canvas id="productChart"></canvas>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
-            <div class="p-6 bg-slate-50/50 border-b flex justify-between items-center">
-                <h3 class="font-bold text-slate-700">Transaction History</h3>
-                <a href="order.html" class="bg-indigo-100 text-indigo-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-indigo-600 hover:text-white transition">New Order</a>
-            </div>
-            <table class="w-full text-left">
-                <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-bold tracking-widest">
-                    <tr>
-                        <th class="px-8 py-4">TXN ID</th>
-                        <th class="px-8 py-4">Timestamp</th>
-                        <th class="px-8 py-4">Total Price</th>
-                        <th class="px-8 py-4 text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="historyBody" class="divide-y text-sm text-slate-600 font-medium"></tbody>
-            </table>
-        </div>
-    </main>
-
+        </main>
+    </div>
     <script src="dashboard.js"></script>
 </body>
 </html>
